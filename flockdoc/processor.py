@@ -13,27 +13,30 @@ def tree_files(root):
 def render_all(source, destination):
     'render all the files in the tree'
     for filename in tree_files(source):
-        cls = None
+        render_single(filename, source, destination)
 
-        if filename.endswith('.md'):
-            cls = MarkdownPage
-        elif 'code' in filename:
-            cls = CodePage
-        else:
-            cls = StaticPage
-
-        render_single(
-            *cls(filename, open(filename, 'r').read()).render(),
-            destination=destination
-        )
-
-def render_single(filename, content, destination):
+def render_single(filename, source, destination):
     'render a single file out to a given destination'
+    # determine class
+    cls = None
+
+    if filename.endswith('.md'):
+        cls = MarkdownPage
+    elif 'code' in filename:
+        cls = CodePage
+    else:
+        cls = StaticPage
+
+    filename, content = cls(filename, open(filename, 'r').read()).render()
+
+    print 'Generating %s...' % filename.replace(source, '{%s => %s}' % (source, destination)),
+
+    new = filename.replace(source, destination)
     try:
-        os.makedirs(os.path.join(destination, os.path.dirname(filename)))
+        os.makedirs(os.path.dirname(new))
     except OSError:  # already exists
         pass
 
-    with open(os.path.join(destination, filename), 'w') as f:
+    with open(new, 'w') as f:
         f.write(content)
-        print "wrote %s" % os.path.join(destination, filename)
+        print "done"
