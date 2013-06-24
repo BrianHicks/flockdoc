@@ -14,7 +14,7 @@ setup(
     name='flockdoc',
     version=flockdoc.__version__,
     packages=find_packages(exclude=('test',)),
-    scripts=[],
+    scripts=["flockdoc/bin/flockdoc"],
     zip_safe=True,
     requires=[
         'Markdown (==2.3.1)',
