@@ -1,6 +1,7 @@
 "functions for handling code"
 from itertools import groupby
 from markdown import markdown
+import os
 from pygments import highlight
 from pygments.lexers import get_lexer_for_filename
 from pygments.formatters import HtmlFormatter
@@ -10,10 +11,10 @@ from ..renderer import env
 
 class CodePage(object):
     LANGUAGES = {
-        "py": "#",
-        "js": "//",
-        "php": "//",
-        "rb": "#",
+        "py": {"name": "Python", "short": set(["#"])},
+        "js": {"name": "JavaScript", "short": set(["//"])},
+        "php": {"name": "PHP", "short": set(["//", "#"])},
+        "rb": {"name": "Ruby", "short": set(["#"])},
     }
 
     def __init__(self, filename, content):
@@ -30,45 +31,56 @@ class CodePage(object):
 
         raise ValueError('Cannot handle "%s". Unknown filetype.' % filename)
 
-    def segment_lines(self, include_type=False):
+    def segment_lines(self):
         'segment lines into groups of comment and code'
-        comment = self.LANGUAGES[self.filetype]
+        short = self.LANGUAGES[self.filetype]["short"]
 
         groups = groupby(
             self.content.strip().split('\n'),
-            lambda line: 'comment' if line.strip().startswith(comment) else 'code',
+            lambda line: any(line.lstrip().startswith(comment) for comment in short) and 'comment' or 'code'
         )
 
         for category, group in groups:
-            if include_type:
-                yield category, '\n'.join(group)
-            else:
-                yield '\n'.join(group)
+            yield category, '\n'.join(group)
 
     def render(self, template='layouts/code.html'):
         'render code content, returning filename and content'
         segments = list(self.segment_lines())
+        short = self.LANGUAGES[self.filetype]["short"]
 
         lexer = get_lexer_for_filename(self.filename)
         formatter = HtmlFormatter()
 
-        sections = [
-            {
-                'markdown': markdown('\n'.join([
-                    line.lstrip(self.LANGUAGES[self.filetype])
-                    for line in segments[i].split('\n')
-                ])),
-                'code': highlight(
-                    '' if i + 1 >= len(segments) else segments[i+1],
-                    lexer, formatter
-                )
-            }
-            for i in range(0, len(segments), 2)
-        ]
+        sections = []
+        for i in range(0, len(segments), 2):
+            section = dict(segments[i:i+2])
+
+            # render comments to markdown
+            comments = []
+            for line in section.get('comment', '').split('\n'):
+                line = line.lstrip()
+
+                for symbol in short:
+                    line = line.lstrip(symbol)
+
+                comments.append(line)
+
+            section['comment'] = markdown('\n'.join(comments))
+
+            # highlight code with pygments
+            if 'code' in section:
+                section['code'] = highlight(section['code'], lexer, formatter)
+            else:
+                section['code'] = ''
+
+            sections.append(section)
 
         rendered = env.get_template(template).render(
             sections=sections,
-            filename=self.filename
+            filename=self.filename,
+            filetype=self.filetype,
+            basename=os.path.basename(self.filename).rsplit('.', 1)[0],
+            language=self.LANGUAGES[self.filetype]["name"],
         )
 
         return self.filename + ".html", rendered
