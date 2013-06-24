@@ -50,3 +50,6 @@ your code. YAML header with Markdown body. Example:
     This is a test document with a key: {{ key }}
 
 Documents are passed through Jinja2 rendering before they are output.
+
+[docco]: http://jashkenas.github.io/docco/
+[jekyll]: http://jekyllrb.com/
