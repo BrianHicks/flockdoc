@@ -17,7 +17,7 @@ setup(
     scripts=[],
     zip_safe=True,
     requires=[
-        
+        'Markdown (==2.3.1)',
     ],
     tests_require=[
         'nose==1.3.0',
