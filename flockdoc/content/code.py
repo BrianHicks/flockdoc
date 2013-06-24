@@ -1,7 +1,11 @@
 "functions for handling code"
 from itertools import groupby
 from markdown import markdown
+from pygments import highlight
+from pygments.lexers import get_lexer_for_filename
+from pygments.formatters import HtmlFormatter
 
+from . import Page
 from ..renderer import env
 
 class CodePage(object):
@@ -39,21 +43,28 @@ class CodePage(object):
             else:
                 yield '\n'.join(group)
 
-    def render(self, template='content/code.html'):
-        'render code content'
+    def render(self, template='layouts/code.html'):
+        'render code content, returning filename and content'
         segments = list(self.segment_lines())
+
+        lexer = get_lexer_for_filename(self.filename)
+        formatter = HtmlFormatter()
+
         sections = [
             {
                 'markdown': markdown('\n'.join([
                     line.lstrip(self.LANGUAGES[self.filetype])
                     for line in segments[i].split('\n')
                 ])),
-                'code': '' if i + 1 >= len(segments) else segments[i+1]
+                'code': highlight(
+                    '' if i + 1 >= len(segments) else segments[i+1],
+                    lexer, formatter
+                )
             }
             for i in range(0, len(segments), 2)
         ]
 
-        return env.get_template('content/code.html').render(
+        return 'code/%s.html' % self.filename, env.get_template('content/code.html').render(
             sections=sections,
             filename=self.filename,
         )
