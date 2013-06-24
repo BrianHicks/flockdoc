@@ -24,4 +24,4 @@ class MarkdownPage(Page):
             **self.meta
         )
 
-        return basename + '.md', rendered
+        return basename + '.html', rendered

@@ -12,6 +12,8 @@ class CodePage(object):
     LANGUAGES = {
         "py": "#",
         "js": "//",
+        "php": "//",
+        "rb": "#",
     }
 
     def __init__(self, filename, content):
@@ -64,7 +66,9 @@ class CodePage(object):
             for i in range(0, len(segments), 2)
         ]
 
-        return 'code/%s.html' % self.filename, env.get_template('content/code.html').render(
+        rendered = env.get_template(template).render(
             sections=sections,
-            filename=self.filename,
+            filename=self.filename
         )
+
+        return self.filename + ".html", rendered
