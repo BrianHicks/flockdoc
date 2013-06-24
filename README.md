@@ -37,8 +37,7 @@ It will be transformed into (roughly) this directory structure:
 ### Individual Files
 
 For code, just write code as normal. Flockdoc will try to take care of
-formatting for you (including multi-line comments, aren't you lucky!) The
-output will look a little like [Docco][docco].
+formatting for you. The output will look a little like [Docco][docco].
 
 For markdown, think [Jekyll][jekyll]: header with layout specified, and then
 your code. YAML header with Markdown body. Example:
