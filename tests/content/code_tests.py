@@ -1,5 +1,5 @@
 "tests for flockdoc/code.py"
-from flockdoc.code import CodePage
+from flockdoc.content.code import CodePage
 
 def test_codepage_init():
     x = CodePage('test.py', 'test')
