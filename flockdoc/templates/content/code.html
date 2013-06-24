@@ -1,0 +1,7 @@
+<div id="filename">{{ filename }}</div>
+{% for section in sections %}
+<div class="section">
+    <div class="markdown">{{ section.markdown }}</div>
+    <div class="code">{{ section.code }}</div>
+</div>
+{% endfor %}
