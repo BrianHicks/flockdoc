@@ -2,24 +2,34 @@
 from itertools import groupby
 from markdown import markdown
 
-LANGUAGES = {
-    "py": "#",
-    "js": "//",
-}
+class CodePage(object):
+    LANGUAGES = {
+        "py": "#",
+        "js": "//",
+    }
 
-def detect_filetype(filename):
-    'detect a filetype to get comments'
-    for ext in reversed(filename.split('.')):
-        if ext in LANGUAGES:
-            return ext
+    def __init__(self, filename, content):
+        self.filename, self.content = filename, content
+        self.filetype = self.detect_filetype()
 
-    raise ValueError('Cannot handle "%s". Unknown filetype' % filename)
+    def detect_filetype(self, filename=None):
+        'detect a filetype to get comments'
+        filename = filename or self.filename
 
-def segment_lines(source, comment):
-    'segment lines into groups of comment and code'
-    groups = groupby(
-        source.strip().split('\n'),
-        lambda line: 'comment' if line.strip().startswith(comment) else 'code',
-    )
-    for category, group in groups:
-        yield category, '\n'.join(list(group))
+        for ext in reversed(filename.split('.')):
+            if ext in self.LANGUAGES:
+                return ext
+
+        raise ValueError('Cannot handle "%s". Unknown filetype.' % filename)
+
+    def segment_lines(self):
+        'segment lines into groups of comment and code'
+        comment = self.LANGUAGES[self.filetype]
+
+        groups = groupby(
+            self.content.strip().split('\n'),
+            lambda line: 'comment' if line.strip().startswith(comment) else 'code',
+        )
+
+        for category, group in groups:
+            yield category, '\n'.join(list(group))

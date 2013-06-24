@@ -1,5 +1,11 @@
 "tests for flockdoc/code.py"
-from flockdoc.code import detect_filetype, segment_lines
+from flockdoc.code import CodePage
+
+def test_codepage_init():
+    x = CodePage('test.py', 'test')
+    assert x.filename == 'test.py', x.filename
+    assert x.content == 'test', x.content
+    assert x.filetype == 'py', x.filetype
 
 def test_detect_filetype_works():
     'test detect_filetype'
@@ -11,31 +17,30 @@ def test_detect_filetype_works():
     }
 
     def check(i, o):
-        actual = detect_filetype(i)
-        assert actual == o, '%r != %r (got %r)' % (i, o, actual)
+        assert i.filetype == o, '%r != %r (got %r)' % (i, o, i.filetype)
 
     for i, o in cases.items():
-        yield check, i, o
+        yield check, CodePage(i, ''), o
 
 def test_detect_filetype_fails():
     'detect_filetype fails when given unknown input'
     try:
-        detect_filetype('what.q')
+        CodePage('what.q', '')
         assert False, "detect_filetype failed to fail at detecting 'what.q'"
-    except ValueError:
-        pass
+    except ValueError as e:
+        assert e.message == 'Cannot handle "what.q". Unknown filetype.', e.message
 
 def test_segment_lines():
     'test segment_lines'
     cases = {
-        ("# test\n1", "#"): [('comment', '# test'), ('code', '1')],
-        ("# test\n# test\n1", "#"): [('comment', '# test\n# test'), ('code', '1')],
-        ("# test\n1\n# test", "#"): [('comment', '# test'), ('code', '1'), ('comment', '# test')],
+        "# test\n1": [('comment', '# test'), ('code', '1')],
+        "# test\n# test\n1": [('comment', '# test\n# test'), ('code', '1')],
+        "# test\n1\n# test": [('comment', '# test'), ('code', '1'), ('comment', '# test')],
     }
     
     def check(i, o):
-        actual = list(segment_lines(*i))
+        actual = list(i.segment_lines())
         assert actual == o, '%r != %r (got %r)' % (i, o, actual)
 
     for i, o in cases.items():
-        yield check, i, o
+        yield check, CodePage('test.py', i), o
