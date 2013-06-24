@@ -18,6 +18,9 @@ setup(
     zip_safe=True,
     requires=[
         'Markdown (==2.3.1)',
+        'PyYAML (==3.10)',
+        'Jinja2 (==2.7)',
+        'Pygments (==1.6)',
     ],
     tests_require=[
         'nose==1.3.0',
