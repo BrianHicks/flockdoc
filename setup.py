@@ -16,11 +16,16 @@ setup(
     packages=find_packages(exclude=('test',)),
     scripts=["flockdoc/bin/flockdoc"],
     zip_safe=True,
-    requires=[
-        'Markdown (==2.3.1)',
-        'PyYAML (==3.10)',
-        'Jinja2 (==2.7)',
-        'Pygments (==1.6)',
+    data_files=[
+        (folder, [os.path.join(folder, f) for f in files])
+        for folder, _, files
+        in os.walk(flockdoc.template_path)
+    ],
+    install_requires=[
+        'Markdown==2.3.1',
+        'PyYAML==3.10',
+        'Jinja2==2.7',
+        'Pygments==1.6',
     ],
     tests_require=[
         'nose==1.3.0',
