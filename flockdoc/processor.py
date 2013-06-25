@@ -10,26 +10,27 @@ def tree_files(root):
         for filename in files:
             yield os.path.join(root, filename)
 
-def render_all(source, destination):
+def render_all(source, destination, code='code', verbose=True):
     'render all the files in the tree'
     for filename in tree_files(source):
-        render_single(filename, source, destination)
+        render_single(filename, source, destination, code, verbose)
 
-def render_single(filename, source, destination):
+def render_single(filename, source, destination, code='code', verbose=True):
     'render a single file out to a given destination'
     # determine class
     cls = None
 
     if filename.endswith('.md'):
         cls = MarkdownPage
-    elif 'code' in filename:
+    elif code in filename:
         cls = CodePage
     else:
         cls = StaticPage
 
     filename, content = cls(filename, open(filename, 'r').read()).render()
 
-    print 'Generating %s...' % filename.replace(source, '{%s => %s}' % (source, destination)),
+    if verbose:
+        print 'Generating %s...' % filename.replace(source, '{%s => %s}' % (source, destination)),
 
     new = filename.replace(source, destination)
     try:
@@ -39,4 +40,5 @@ def render_single(filename, source, destination):
 
     with open(new, 'w') as f:
         f.write(content)
-        print "done"
+        if verbose:
+            print "done"

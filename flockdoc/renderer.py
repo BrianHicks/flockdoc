@@ -9,12 +9,7 @@ loader = ChoiceLoader([
     FileSystemLoader(os.path.join(os.getcwd(), 'templates')),
 
     # then load package templates
-    # when packaged:
-    FileSystemLoader(os.path.join(sys.prefix, template_path)),
-
-    # in development:
-    FileSystemLoader(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')),
+    FileSystemLoader(template_path),
 ])
 
 env = Environment(loader=loader)
-
