@@ -1,7 +1,7 @@
 import sys
 import os
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 if 'templates' in os.listdir(os.path.dirname(__file__)):
     template_path = 'flockdoc/templates'  # relative to the root directory
