@@ -15,6 +15,7 @@ class CodePage(object):
         "js": {"name": "JavaScript", "short": set(["//"])},
         "php": {"name": "PHP", "short": set(["//", "#"])},
         "rb": {"name": "Ruby", "short": set(["#"])},
+        "cs": {"name": "C-Sharp", "short": set(["//"])},
     }
 
     def __init__(self, filename, content):
